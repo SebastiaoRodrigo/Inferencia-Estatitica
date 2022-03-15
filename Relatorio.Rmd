@@ -1,0 +1,309 @@
+---
+title: "Prova2"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Questão 1
+*Queremos testar a hipotese nula de que os dados vem de uma distribuição poisson com parametro $\lambda$. Portanto, formalmente, temos:*
+
+
+$H_0=$existe um valor $\lambda$, tal que $p_i = \pi_i(\lambda)$ para $i=1,2,3,4.$
+
+
+$H_1=H_0$ seja falso.                                                   
+                                       
+            
+
+```{r}
+N <- c(1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 2, 1, 2, 0, 0,0,0,0,2,1,0,0,1,0,1,1,0,1,1,1,0,0,1,0,0,1,0,0,1,0,0,0,1,0,1,0,1,1,0,1,0,0,1,1,0,0,0,0,0,0,0,3,0,0,1,1,0,2,1,1,2,0,0,0,1,1,0,0,0,0,0,0,0,1,1,1,1,0,0,0,1,0,0,1,0,0,0,0,0,0)
+x<- table(N)
+n <- mean(N)
+x
+
+```
+*Portanto temos acima a tabela, em que:*
+
+$N_0 = 61$
+
+$N_1 = 33$
+
+$N_2 = 5$
+
+$N_3 = 1$
+
+*Para realizar esse teste, usarei a estatistica $Q'$.*
+
+*Apos, acima ja calcumalos a media, a usaremos como estimador de máxima verossimilhança, como dito na questão,e posterior a isso, iremos calcular as respesctivas propabilidades e por fim teremos o vetor de probabalidade.*
+
+```{r}
+p0 = dpois(0, n, log = FALSE)
+p1 = dpois(1, n, log = FALSE)
+p2 = dpois(2, n, log = FALSE)
+p3 = 1-(p0+p2+p1)
+p <- c(p0,p1,p2,p3)
+p
+### Esperança:
+```
+
+
+*Calculando o vetor das esperanças, sabendo como dito na questao que n=100*
+
+```{r}
+E <- c(100*p0,100*p1,100*p2,100*p3)
+E
+```
+*Calculando o $Q'$, com teremos o valor e apos iremos calcular .Apos o calculo, iremos calcular os dos valores da Qui-Quadrado, com respectiva 2 e 3 graus de liberdade.*
+
+```{r}
+q = sum((x-E)^2/E)
+q
+```
+```{r}
+1-pchisq(q,2)
+```
+```{r}
+1-pchisq(q,3)
+```
+*como estamos vendo o temos o p-valor esta(0.5902096,0.7880544) e são altos, então nao rejeitamos $H_0$ ao nivel de 1% de significancia*
+
+
+# Questão 2
+*Iremos primeiro carregar nossos dados, como foi dito na questão, os dados se emcontram no arquivo 'q2.txt', com isso usarei o read() para ler o arquivo*
+```{r}
+dados <- read.table("q2.txt",header=TRUE)
+head(dados)
+```
+*Primeiramente, iremos mostrar nossa tabela de contigencia:*
+
+```{r}
+tab <- table(dados)
+tab
+```
+*Queremos testar:*
+*Assumiremos que $p_{ij}$ a probabilidade de uma pessoa da população `Opinião` estar na categoria `Idade`. De tal modo:*
+
+*$\sum_{j=1}^{C} p_{ij} = 1, j= 1,...,L$*
+
+
+\begin{align*}
+H_0:\;& p_{1j} =...=p_{Lj},\;j=1,2,...,C\
+\
+H_1:\;& H_0 \mbox{ nao verdadeira },
+\end{align*}
+
+
+*Apos, podemos calcular as nossas frenquencias esperadas:* 
+```{r}
+E <- matrix(NA,3,3)
+for(i in 1:3){
+  for(j in 1:3){
+    E[i,j] <- sum(tab[i,])*sum(tab[,j])/sum(tab)
+  }
+}
+E
+```
+*Agora iremos realizar nosso teste, utilizarei a funcao do r, que já faz, a partir da nossa tabela: *
+
+
+```{r}
+chisq.test(tab)
+```
+*Temos que quantil, será:*
+```{r}
+qchisq(0.99,4)
+```
+*Logo nao rejeitamos $H_0$ ao nivel de 1% de significancia*
+
+*O p-valor desse teste é calculado da forma:*
+```{r}
+1-pchisq(8.7045,4)
+```
+*Valor similar ao entrado no teste do R, valor esse alto, portanto mais uma vez temos envidencia para nao rejeita H0.*
+
+
+
+
+
+
+
+
+# Questão 3
+*Seja $F(x)$ a função de distribuição acumulada da variavel aleatória $X$, que são o tempo do novo reagente. Seja $F^\ast(x)$ um distrição acumulada da distribuição exponecial com parametro $\frac{1}{3}$,pois como foi dito na questão a media é igual a 3*
+
+
+
+\begin{align*}
+H_0:\;& F(x)=F^\ast(x),\\
+H_1:\;& H_0 \mbox{ é  falsa. }
+\end{align*}
+
+*Carregando os dados*
+```{r}
+x <- scan("q3.txt")
+head(x)
+
+```
+
+*Os valores da distruibição empirica, são os valores que para cada valor da amostra, saõ proporcionalmente menores ou iguais ao mesmo valor. Portanto, utilizando um codigo já mostrando em aula , temos:*
+
+```{r}
+n <- length(x)   # tamanho da amostra
+y <- sort(x)   # valores ordenados
+Fn <- 1:n/n   # empírica
+Fn
+```
+
+
+
+
+
+
+
+
+```{r}
+hist(x,prob = TRUE)
+curve(dexp(x,1/3),lwd=3,col=4,add=TRUE)
+```
+
+
+
+
+
+
+*Grafico da distribuição empirica com a função:*
+
+```{r}
+plot(ecdf(x))
+curve(pexp(x,1/3),add = TRUE, col = 2, lwd = 2)
+```
+
+
+
+*Usarei a função do R, que calcula o teste:*
+
+```{r}
+ks.test(x,"pexp",1/3,exact =FALSE)
+```
+
+*Podemos ver que o $D_n = 0.20681$, porém usaremos que o vimos em aula, utilizando a distribuição assintotica $\sqrt{N}D_n$, com isso temos que:*
+
+*$\sqrt{12}D_n =$* 0.716411
+
+*Utilizando as funções dadas em aula para o teste de K-S, teremso como calcular nosso quantil e p-valor:*
+
+```{r}
+
+pH <- function(t){
+  # calcula a f.d.a. da estatistica do teste de Kolmogorov-Smirnov
+  i <- 1:100
+  aux <- 1 - 2*sum((-1)^(i-1)*exp(-2*i^2*t^2))
+  return(aux)
+}
+
+qH <- function(p){
+  # calcula o quantil da estatistica do teste de Kolmogorov-Smirnov
+  x <- seq(0,2.5,by=0.0001)
+  aux <- NULL
+  for(i in 1:length(x)){
+    aux[i] <- pH(x[i])
+  }
+  d <- abs(aux-p)
+  aux2 <- x[which.min(d)]
+  return(aux2)
+}
+```
+
+
+*Rejeitamos H0 caso:*
+```
+```{r}
+0.716411 > qH(0.95)
+```
+
+```
+
+
+*Podemos ver que nao temos evidencias para rejeitar h0 ao nivel de 5% de siginificancia.*
+
+*O p-valor será $\mathbb{P}(\sqrt{12}D_{12} \ge 0.716411  )$*
+```{r}
+1-pH(0.716411)
+```
+*Igual ao teste do r, mais uma vez um p-valor alto, mais evidencias para nao rejeitar H0*
+
+
+# Questão 4
+
+*Seja $F(x)$ a função  de distribuição acumulada da variavel aleatoria representando os tempos de atemdimento do 'q4am1' e seja $G(x)$ a função de distribuição acumulada da variavel aleatoria representando os tempos de atendimento de 'q4am2'. Queremos testar:*
+\begin{align*}
+H_0:\;& F(x)=G(x),\\
+H_1:\;& H_0 \mbox{ é falsa. }
+\end{align*}
+
+
+
+
+
+
+*Processando os dados da questao:*
+```{r}
+a <- scan("q4am1.txt")
+b <- scan("q4am2.txt")
+```
+*Calculando os valores da funcao empirica de cada amostra:*
+
+```{r}
+n1 <- length(a)   # tamanho da amostra
+y1 <- sort(a)   # valores ordenados
+Fn1 <- 1:n1/n1   # empírica
+Fn1
+```
+
+```{r}
+n2 <- length(b)   # tamanho da amostra
+y2 <- sort(b)   # valores ordenados
+Fn2 <- 1:n2/n2   # empírica
+Fn2
+```
+
+*Abaixo o grafico das funçóes empiricas:*
+```{r}
+plot(ecdf(a),xlim=c(min(a,b),max(a,b)))
+lines(ecdf(b),col=2)
+```
+
+
+
+**
+*Mais uma vez utilizarei o comando o r,para relaizar o teste*
+```{r}
+ks.test(a,b,exact =FALSE)
+```
+*Para fazer nosso teste, teremos que:*
+```{r}
+N <- length(a)
+M <- length(b)
+d <- ((N*M)/(N+M))^(1/2)
+d*0.5
+```
+*Utilizando o que vimos na questão 3, termos que nosso teste será:*
+```{r}
+0.5*d > qH(0.95)
+```
+*Logo nao temos evidencias aora rejeitar H0 ao nivel de 5% de significancia*
+
+*O nosso p-valor assim como na questao 3, farei uso do codigo disponivel em aula para achar o valor, que sera:*
+```{r}
+1-pH(0.5*d )
+```
+
+```{r}
+
+```
+
